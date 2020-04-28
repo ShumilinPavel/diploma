@@ -4,7 +4,6 @@
 .idea/*
 log.txt
 chromedriver.exe
-utils.py
 
 # User-specific stuff
 .idea/**/workspace.xml

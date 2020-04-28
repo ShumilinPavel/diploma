@@ -7,6 +7,7 @@ import configparser
 
 from Logger import *
 from Postgres import *
+from CsvWriter import *
 
 
 class GooglePlayScraper:
@@ -16,6 +17,7 @@ class GooglePlayScraper:
 
         self.url_to_scrap = self.config[application_name]['url_to_scrap']
         self.database_table = self.config[application_name]['database_table']
+        self.application_file_prefix = self.config[application_name]['application_file_prefix']
         self.sleep_in_seconds = int(self.config['Scraper']['sleep_in_seconds'])
         self.page_to_parse_index = 0
 
@@ -93,7 +95,13 @@ class GooglePlayScraper:
             print(len(reviews))
 
             reviews_data = self.__get_reviews_data(reviews)
-            self.postgres.write(reviews_data, self.database_table)
+
+            ##
+            # self.postgres.write(reviews_data, self.database_table)
+            csv_writer = CsvWriter('./{0}.csv'.format(self.application_file_prefix))
+            csv_writer.write(reviews_data)
+            ##
+
             self.__delete_reviews()
 
             self.__trigger_next_page()
