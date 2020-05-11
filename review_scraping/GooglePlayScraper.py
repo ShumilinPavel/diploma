@@ -5,27 +5,23 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 import configparser
 
-from Logger import *
-from Postgres import *
-from CsvWriter import *
+from MongoDb import *
 
 
 class GooglePlayScraper:
-    def __init__(self, application_name):
-        self.config = configparser.ConfigParser()
-        self.config.read('settings.ini')
-
-        self.url_to_scrap = self.config[application_name]['url_to_scrap']
-        self.database_table = self.config[application_name]['database_table']
-        self.application_file_prefix = self.config[application_name]['application_file_prefix']
-        self.sleep_in_seconds = int(self.config['Scraper']['sleep_in_seconds'])
+    def __init__(self, application_name, config_file_name):
         self.page_to_parse_index = 0
-
+        self.__parse_config(config_file_name, application_name)
         self.__create_driver()
-        self.__create_database_connection()
-        self.__create_logger(application_name)
+        self.mongo = MongoDb(self.collection_name_prefix)
 
-        self.postgres.connect()
+    def __parse_config(self, config_file_name, application_name):
+        self.config = configparser.ConfigParser()
+        self.config.read(config_file_name)
+        self.url_to_scrap = self.config[application_name]['url_to_scrap']
+        self.collection_name_prefix = self.config[application_name]['collection_name_prefix']
+        self.sleep_in_seconds = int(self.config['Scraper']['sleep_in_seconds'])
+        self.page_to_scrap_count = int(self.config['Scraper']['page_to_scrap_count'])
 
     def __create_driver(self):
         chrome_options = Options()
@@ -33,29 +29,13 @@ class GooglePlayScraper:
         chrome_options.add_argument('--headless')
         self.driver = webdriver.Chrome(options=chrome_options)
 
-    def __create_database_connection(self):
-        name = self.config['Database']['name']
-        user = self.config['Database']['user']
-        password = self.config['Database']['password']
-        host = self.config['Database']['host']
-        port = self.config['Database']['port']
-        self.postgres = Postgres(name, user, password, host, port)
-
-    def __create_logger(self, application_name):
-        log_file = self.config[application_name]['log_file']
-        self.logger = Logger(log_file)
-
     def skip_first_pages(self, pages_count):
         for i in range(pages_count):
-            self.logger.log("Пропуск страницы номер {0}\n".format(self.page_to_parse_index))
             self.page_to_parse_index += 1
-
             self.__delete_reviews()
             self.__trigger_next_page()
-
             if self.__check_button_existence():
                 self.__click_button()
-
             time.sleep(self.sleep_in_seconds)
 
     def __delete_reviews(self):
@@ -69,7 +49,8 @@ class GooglePlayScraper:
     def __trigger_next_page(self):
         self.driver.execute_script('window.scrollBy(0, -20)')
         self.driver.execute_script(
-            'window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"})')
+            'window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"})'
+        )
 
     def __check_button_existence(self):
         try:
@@ -84,26 +65,19 @@ class GooglePlayScraper:
 
     def scrap(self):
         self.driver.get(self.url_to_scrap)
-        page_to_scrap_count = int(self.config['Scraper']['page_to_scrap_count'])
-        for i in range(page_to_scrap_count):
-            self.logger.log("[INFO] текущая страница {0}\n".format(self.page_to_parse_index))
+        for i in range(self.page_to_scrap_count):
             self.page_to_parse_index += 1
 
             reviews = self.__get_reviews_containers()
-
-            self.logger.log("[INFO] получено отзывов со страницы {0}\n".format(len(reviews)))
-            print(len(reviews))
+            if len(reviews) == 40:
+                print("OK: {0} out of 40".format(len(reviews)))
+            else:
+                print("WARN: {0} out of 40".format(len(reviews)))
 
             reviews_data = self.__get_reviews_data(reviews)
-
-            ##
-            # self.postgres.write(reviews_data, self.database_table)
-            csv_writer = CsvWriter('./{0}.csv'.format(self.application_file_prefix))
-            csv_writer.write(reviews_data)
-            ##
+            self.mongo.write_reviews(reviews_data)
 
             self.__delete_reviews()
-
             self.__trigger_next_page()
 
             if self.__check_button_existence():
@@ -117,23 +91,28 @@ class GooglePlayScraper:
             reviews = self.driver.find_elements_by_xpath("//div[contains(@jsname, 'fk8dgd')]/div")
             return reviews
         except Exception as e:
-            self.logger.log("[ERROR] ошибка при получении отзывов со страницы: {0}\n".format(str(e)))
+            print("[ERROR] ошибка при получении отзывов со страницы: {0}\n".format(str(e)))
+            return []
 
     def __get_reviews_data(self, reviews):
         reviews_data = []
         for review in reviews:
             name = review.find_element_by_xpath(".//span[contains(@class, 'X43Kjb')]").text
-            score = review.find_element_by_xpath(".//div[contains(@role, 'img')]").get_attribute(
-                "aria-label").split()[2]
+            score = review.find_element_by_xpath(
+                ".//div[contains(@role, 'img')]"
+            ).get_attribute("aria-label").split()[2]
             likes = review.find_element_by_xpath(".//div[contains(@class, 'jUL89d y92BAb')]").text
             date = self.__get_date(review)
             has_photo = '/photo.jpg' not in review.find_element_by_xpath(
-                ".//img[contains(@class, 'T75of ZqMJr')]").get_attribute("src")
-
+                ".//img[contains(@class, 'T75of ZqMJr')]"
+            ).get_attribute("src")
             text = review.find_element_by_xpath(".//span[contains(@jsname, 'fbQN7e')]").get_attribute('textContent')
             if text == '':
                 text = review.find_element_by_xpath(".//span[contains(@jsname, 'bN97Pc')]").text
-            reviews_data.append((name, score, date, likes, has_photo, text))
+            # TODO: likes = "" -> 0
+            reviews_data.append({
+                'name': name, 'score': score, 'date': date, 'likes': likes, 'has_photo': has_photo, 'text': text
+            })
         return reviews_data
 
     def __get_date(self, review):
@@ -149,6 +128,8 @@ class GooglePlayScraper:
 
 
 if __name__ == '__main__':
-    application_name = 'YandexMail'
-    scraper = GooglePlayScraper(application_name)
+    # application_name = 'YandexMail'
+    application_name = 'Duolingo'
+    config_file_name = '../settings.ini'
+    scraper = GooglePlayScraper(application_name, config_file_name)
     scraper.scrap()

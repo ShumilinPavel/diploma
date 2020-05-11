@@ -1,0 +1,116 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'settings.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.0
+#
+# WARNING! All changes made in this file will be lost!
+
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+class Ui_SettingsMainWindow(object):
+    def setupUi(self, SettingsMainWindow):
+        SettingsMainWindow.setObjectName("SettingsMainWindow")
+        SettingsMainWindow.resize(312, 352)
+        self.settings_centralwidget = QtWidgets.QWidget(SettingsMainWindow)
+        self.settings_centralwidget.setObjectName("settings_centralwidget")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.settings_centralwidget)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.aspects_header = QtWidgets.QLabel(self.settings_centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        font.setStrikeOut(False)
+        self.aspects_header.setFont(font)
+        self.aspects_header.setAlignment(QtCore.Qt.AlignCenter)
+        self.aspects_header.setObjectName("aspects_header")
+        self.verticalLayout.addWidget(self.aspects_header)
+        self.aspectsFormLayout = QtWidgets.QFormLayout()
+        self.aspectsFormLayout.setHorizontalSpacing(15)
+        self.aspectsFormLayout.setObjectName("aspectsFormLayout")
+        self.minsup_label = QtWidgets.QLabel(self.settings_centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.minsup_label.setFont(font)
+        self.minsup_label.setWordWrap(True)
+        self.minsup_label.setObjectName("minsup_label")
+        self.aspectsFormLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minsup_label)
+        self.minsup_line_edit = QtWidgets.QLineEdit(self.settings_centralwidget)
+        self.minsup_line_edit.setMaximumSize(QtCore.QSize(200, 16777215))
+        self.minsup_line_edit.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.minsup_line_edit.setObjectName("minsup_line_edit")
+        self.aspectsFormLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.minsup_line_edit)
+        self.verticalLayout.addLayout(self.aspectsFormLayout)
+        self.opinions_header = QtWidgets.QLabel(self.settings_centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.opinions_header.setFont(font)
+        self.opinions_header.setAlignment(QtCore.Qt.AlignCenter)
+        self.opinions_header.setObjectName("opinions_header")
+        self.verticalLayout.addWidget(self.opinions_header)
+        self.opinionsFormLayout = QtWidgets.QFormLayout()
+        self.opinionsFormLayout.setHorizontalSpacing(15)
+        self.opinionsFormLayout.setObjectName("opinionsFormLayout")
+        self.window_label = QtWidgets.QLabel(self.settings_centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.window_label.sizePolicy().hasHeightForWidth())
+        self.window_label.setSizePolicy(sizePolicy)
+        self.window_label.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.window_label.setFont(font)
+        self.window_label.setWordWrap(True)
+        self.window_label.setObjectName("window_label")
+        self.opinionsFormLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.window_label)
+        self.window_line_edit = QtWidgets.QLineEdit(self.settings_centralwidget)
+        self.window_line_edit.setMaximumSize(QtCore.QSize(200, 16777215))
+        self.window_line_edit.setObjectName("window_line_edit")
+        self.opinionsFormLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.window_line_edit)
+        self.verticalLayout.addLayout(self.opinionsFormLayout)
+        self.buttons_hl = QtWidgets.QHBoxLayout()
+        self.buttons_hl.setSpacing(15)
+        self.buttons_hl.setObjectName("buttons_hl")
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.buttons_hl.addItem(spacerItem)
+        self.submit_btn = QtWidgets.QPushButton(self.settings_centralwidget)
+        self.submit_btn.setObjectName("submit_btn")
+        self.buttons_hl.addWidget(self.submit_btn)
+        self.cancel_btn = QtWidgets.QPushButton(self.settings_centralwidget)
+        self.cancel_btn.setObjectName("cancel_btn")
+        self.buttons_hl.addWidget(self.cancel_btn)
+        self.verticalLayout.addLayout(self.buttons_hl)
+        self.verticalLayout.setStretch(0, 1)
+        self.verticalLayout.setStretch(1, 2)
+        self.verticalLayout.setStretch(2, 1)
+        self.verticalLayout.setStretch(3, 2)
+        self.verticalLayout.setStretch(4, 1)
+        SettingsMainWindow.setCentralWidget(self.settings_centralwidget)
+
+        self.retranslateUi(SettingsMainWindow)
+        QtCore.QMetaObject.connectSlotsByName(SettingsMainWindow)
+
+    def retranslateUi(self, SettingsMainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        SettingsMainWindow.setWindowTitle(_translate("SettingsMainWindow", "MainWindow"))
+        self.aspects_header.setText(_translate("SettingsMainWindow", "Параметры для поиска частых аспектов"))
+        self.minsup_label.setText(_translate("SettingsMainWindow", "Минимальная поддержка"))
+        self.opinions_header.setText(_translate("SettingsMainWindow", "Параметры для поиска мнений"))
+        self.window_label.setText(_translate("SettingsMainWindow", "Размер окна для поиска сентимента"))
+        self.submit_btn.setText(_translate("SettingsMainWindow", "Принять"))
+        self.cancel_btn.setText(_translate("SettingsMainWindow", "Отмена"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    SettingsMainWindow = QtWidgets.QMainWindow()
+    ui = Ui_SettingsMainWindow()
+    ui.setupUi(SettingsMainWindow)
+    SettingsMainWindow.show()
+    sys.exit(app.exec_())
