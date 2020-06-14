@@ -10,6 +10,7 @@ class SettingsWindow(QMainWindow, settings.Ui_SettingsMainWindow):
         self.setupUi(self)
         self.mongo = mongo
         self.main_window = main_window
+        self.cur_app_label = self.main_window.applications_combo_box.currentText()
         self.__fill_line_edits()
         self.__setup_signals()
 
@@ -18,12 +19,12 @@ class SettingsWindow(QMainWindow, settings.Ui_SettingsMainWindow):
         self.__fill_window()
 
     def __fill_minsup(self):
-        doc = self.mongo.load_minimum_support()
+        doc = self.mongo.load_minimum_support(self.cur_app_label)
         minsup = doc['minsup']
         self.minsup_line_edit.setText(str(minsup))
 
     def __fill_window(self):
-        doc = self.mongo.load_window_radius()
+        doc = self.mongo.load_window_radius(self.cur_app_label)
         window_radius = doc['window']
         self.window_line_edit.setText(str(window_radius))
 
@@ -37,7 +38,7 @@ class SettingsWindow(QMainWindow, settings.Ui_SettingsMainWindow):
     def __on_submit_click(self):
         minsup = self.minsup_line_edit.text()
         window_radius = self.window_line_edit.text()
-        self.mongo.save_settings(minsup, window_radius)
+        self.mongo.update_settings(self.cur_app_label, minsup, window_radius)
         t1 = threading.Thread(target=self.main_window.process_with_new_settings)
         t1.start()
         self.close()

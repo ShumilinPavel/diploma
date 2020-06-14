@@ -97,12 +97,12 @@ class Ui_SettingsMainWindow(object):
 
     def retranslateUi(self, SettingsMainWindow):
         _translate = QtCore.QCoreApplication.translate
-        SettingsMainWindow.setWindowTitle(_translate("SettingsMainWindow", "MainWindow"))
-        self.aspects_header.setText(_translate("SettingsMainWindow", "Параметры для поиска частых аспектов"))
-        self.minsup_label.setText(_translate("SettingsMainWindow", "Минимальная поддержка"))
+        SettingsMainWindow.setWindowTitle(_translate("SettingsMainWindow", "Параметры анализа"))
+        self.aspects_header.setText(_translate("SettingsMainWindow", "Параметры для поиска аспектов"))
+        self.minsup_label.setText(_translate("SettingsMainWindow", "Минимальная поддержка, %"))
         self.opinions_header.setText(_translate("SettingsMainWindow", "Параметры для поиска мнений"))
-        self.window_label.setText(_translate("SettingsMainWindow", "Размер окна для поиска сентимента"))
-        self.submit_btn.setText(_translate("SettingsMainWindow", "Принять"))
+        self.window_label.setText(_translate("SettingsMainWindow", "Радиус окна поиска тон. лексики"))
+        self.submit_btn.setText(_translate("SettingsMainWindow", "Выполнить анализ"))
         self.cancel_btn.setText(_translate("SettingsMainWindow", "Отмена"))
 
 

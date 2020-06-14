@@ -1,5 +1,6 @@
 import pandas as pd
 from MongoDb import *
+from pymorphy2 import MorphAnalyzer
 
 
 class SentimentDictionaryCreator:
@@ -10,6 +11,8 @@ class SentimentDictionaryCreator:
         # self.adjective_to_polarity = dict()
         self.sentiment_docs = []
         self.mongo = MongoDb("")
+        self.morph = MorphAnalyzer()
+        self.already_in_docs = set()
 
     def create(self):
         self.__process_ru_wordnet_affect()
@@ -27,8 +30,15 @@ class SentimentDictionaryCreator:
                 if '\t' in line:
                     rus_words = line.split('\t')[3]
                     for word in rus_words.split():
-                        # self.adjective_to_polarity[word.replace('_', ' ')] = mark
-                        self.sentiment_docs.append({'word': word.replace('_', ' '), 'polarity': mark})
+                        morphed = self.morph.parse(word)[0]
+                        pos = morphed.tag.POS
+                        if pos == 'INFN' or (pos == 'NOUN' and morphed.score >= 0.5):
+                            continue
+                        word = word.replace('_', ' ')
+                        if word not in self.already_in_docs:
+                            # self.adjective_to_polarity[word.replace('_', ' ')] = mark
+                            self.sentiment_docs.append({'word': word, 'polarity': mark})
+                            self.already_in_docs.add(word)
 
     def __process_rusentilex(self):
         with open(self.rusentilex_file, 'r', encoding='utf-8-sig') as file:
@@ -42,23 +52,24 @@ class SentimentDictionaryCreator:
                 source = words[4]
                 # if pos == 'Adj' and lemma not in self.adjective_to_polarity.keys() and source == 'opinion':
                 #     self.adjective_to_polarity[lemma] = polarity
-                if pos == 'Adj' and lemma not in set(doc['word'] for doc in self.sentiment_docs) and source == 'opinion':
+                if pos == 'Adj' and source == 'opinion' and lemma not in self.already_in_docs:
                     self.sentiment_docs.append({'word': lemma, 'polarity': polarity})
+                    self.already_in_docs.add(lemma)
 
     def write_sentiment_dictionary(self):
         self.mongo.write_sentiment_dictionary(self.sentiment_docs)
 
-    def save_to_csv(self, file_name):
-        df = pd.DataFrame({'word': list(self.adjective_to_polarity.keys()), 'polarity': list(self.adjective_to_polarity.values())})
-        df.to_csv(file_name)
+    # def save_to_csv(self, file_name):
+    #     df = pd.DataFrame({'word': list(self.adjective_to_polarity.keys()), 'polarity': list(self.adjective_to_polarity.values())})
+    #     df.to_csv(file_name)
 
 
 if __name__ == '__main__':
-    prepath = '../resourses/WordNetAffectRuRomVer2\WordNet-AffectRuRomVer2/'
+    prepath = './resources/WordNet-AffectRuRomVer2/'
     sentiment_dictionary_creator = SentimentDictionaryCreator(
-        [prepath+'joy.txt', prepath+'surprise.txt'],
-        [prepath+'anger.txt', prepath+'disgust.txt', prepath+'fear.txt', prepath+'sadness.txt'],
-        '../resourses/'+'rusentilex_2017.txt'
+        [prepath + 'joy.txt', prepath + 'surprise.txt'],
+        [prepath + 'anger.txt', prepath + 'disgust.txt', prepath + 'fear.txt', prepath + 'sadness.txt'],
+        './resources/' + 'rusentilex_2017.txt'
     )
     sentiment_dictionary_creator.create()
     sentiment_dictionary_creator.write_sentiment_dictionary()

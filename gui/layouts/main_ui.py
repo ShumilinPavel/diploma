@@ -3,60 +3,86 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_main_window(object):
     def setupUi(self, main_window):
-        main_window.resize(1018, 623)
+        main_window.resize(1067, 650)
 
         self.central_widget = QtWidgets.QWidget(main_window)
+
         self.verticalLayout = QtWidgets.QVBoxLayout(self.central_widget)
+
         self.header_hl = QtWidgets.QHBoxLayout()
         self.header_hl.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
-        self.aspect_label = QtWidgets.QLabel(self.central_widget)
 
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
+
+        # sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        # sizePolicy.setHorizontalStretch(3)
+        # sizePolicy.setVerticalStretch(0)
+        # self.verticalLayout_3.setSize
+
+
+        self.label_3 = QtWidgets.QLabel(self.central_widget)
+        self.label_3.setMaximumSize(QtCore.QSize(115, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        self.label_3.setFont(font)
+        self.label_3.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.addWidget(self.label_3)
+
+        self.applications_combo_box = QtWidgets.QComboBox(self.central_widget)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.applications_combo_box.setFont(font)
+
+        self.horizontalLayout_2.addWidget(self.applications_combo_box)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_2)
+
+        self.aspect_label = QtWidgets.QLabel(self.central_widget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.aspect_label.sizePolicy().hasHeightForWidth())
-
         self.aspect_label.setSizePolicy(sizePolicy)
-        self.aspect_label.setMaximumSize(QtCore.QSize(100, 16777215))
-
+        self.aspect_label.setMinimumSize(QtCore.QSize(115, 0))
+        self.aspect_label.setMaximumSize(QtCore.QSize(115, 16777215))
         font = QtGui.QFont()
-        font.setPointSize(16)
-
+        font.setPointSize(13)
         self.aspect_label.setFont(font)
+        self.aspect_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.header_hl.addWidget(self.aspect_label)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.addWidget(self.aspect_label)
 
         self.aspects_combo_box = QtWidgets.QComboBox(self.central_widget)
-
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(3)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.aspects_combo_box.sizePolicy().hasHeightForWidth())
-
         self.aspects_combo_box.setSizePolicy(sizePolicy)
         self.aspects_combo_box.setMinimumSize(QtCore.QSize(0, 0))
-
         font = QtGui.QFont()
         font.setPointSize(10)
-
         self.aspects_combo_box.setFont(font)
-        # self.aspects_combo_box.addItem("")
-        # self.aspects_combo_box.addItem("")
-        # self.aspects_combo_box.addItem("")
 
-        self.header_hl.addWidget(self.aspects_combo_box)
+        self.horizontalLayout_4.addWidget(self.aspects_combo_box)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_4)
+        self.header_hl.addLayout(self.verticalLayout_3)
 
-        spacerItem = QtWidgets.QSpacerItem(50, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.header_hl.addItem(spacerItem)
+        # spacerItem = QtWidgets.QSpacerItem(50, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        # self.header_hl.addItem(spacerItem)
 
         self.settings_btn = QtWidgets.QPushButton(self.central_widget)
-
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
-
         sizePolicy.setHeightForWidth(self.settings_btn.sizePolicy().hasHeightForWidth())
         self.settings_btn.setSizePolicy(sizePolicy)
+        self.settings_btn.setMinimumSize(QtCore.QSize(0, 0))
+        self.settings_btn.setMaximumSize(QtCore.QSize(200, 50))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.settings_btn.setFont(font)
 
         self.header_hl.addWidget(self.settings_btn)
         self.verticalLayout.addLayout(self.header_hl)
@@ -69,37 +95,37 @@ class Ui_main_window(object):
         self.status_hl.addWidget(self.progress_bar)
         self.verticalLayout.addLayout(self.status_hl)
 
+        self.line = QtWidgets.QFrame(self.central_widget)
+        self.line.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.line)
+
         self.polarity_hl = QtWidgets.QHBoxLayout()
 
         self.positive_rb = QtWidgets.QRadioButton(self.central_widget)
-
+        self.positive_rb.polarity = 'positive'
         font = QtGui.QFont()
         font.setPointSize(12)
-
-        self.positive_rb.polarity = 'positive'
         self.positive_rb.setFont(font)
         self.positive_rb.setChecked(True)
-        self.positive_rb.setObjectName("positive_rb")
+
         self.polarity_hl.addWidget(self.positive_rb, 0, QtCore.Qt.AlignHCenter)
 
         self.negative_rb = QtWidgets.QRadioButton(self.central_widget)
-
+        self.negative_rb.polarity = 'negative'
         font = QtGui.QFont()
         font.setPointSize(12)
-
-        self.negative_rb.polarity = 'negative'
         self.negative_rb.setFont(font)
-        self.negative_rb.setObjectName("negative_rb")
+
         self.polarity_hl.addWidget(self.negative_rb, 0, QtCore.Qt.AlignHCenter)
 
         self.neutral_rb = QtWidgets.QRadioButton(self.central_widget)
-
+        self.neutral_rb.polarity = 'neutral'
         font = QtGui.QFont()
         font.setPointSize(12)
-
-        self.neutral_rb.polarity = 'neutral'
         self.neutral_rb.setFont(font)
-        self.neutral_rb.setObjectName("neutral_rb")
+
         self.polarity_hl.addWidget(self.neutral_rb, 0, QtCore.Qt.AlignHCenter)
 
         #
@@ -173,22 +199,22 @@ class Ui_main_window(object):
 
     def retranslateUi(self, main_window):
         _translate = QtCore.QCoreApplication.translate
-        main_window.setWindowTitle(_translate("main_window", "MainWindow"))
+        main_window.setWindowTitle(_translate("main_window", "Просмотр отзывов"))
+        self.label_3.setText(_translate("main_window", "Приложение"))
         self.aspect_label.setText(_translate("main_window", "Аспект"))
         # self.aspects_combo_box.setItemText(0, _translate("main_window", "Дизайн"))
         # self.aspects_combo_box.setItemText(1, _translate("main_window", "Почта"))
         # self.aspects_combo_box.setItemText(2, _translate("main_window", "Приложение"))
-        self.settings_btn.setText(_translate("main_window", "Настройки"))
-        self.positive_rb.setText(_translate("main_window", "Positive"))
-        self.negative_rb.setText(_translate("main_window", "Negative"))
-        self.neutral_rb.setText(_translate("main_window", "Neutral"))
+        self.settings_btn.setText(_translate("main_window", "Параметры..."))
+        self.positive_rb.setText(_translate("main_window", "Положительные"))
+        self.negative_rb.setText(_translate("main_window", "Отрицательные"))
+        self.neutral_rb.setText(_translate("main_window", "Нейтральные"))
         self.table_widget.setSortingEnabled(True)
 
         self.status_label.setText(_translate("main_window", "Статус"))
         self.progress_bar.setValue(0)
         self.progress_bar.hide()
         self.status_label.hide()
-
 
         # item = self.table_widget.verticalHeaderItem(0)
         # item.setText(_translate("main_window", "1"))
@@ -201,7 +227,7 @@ class Ui_main_window(object):
         item = self.table_widget.horizontalHeaderItem(2)
         item.setText(_translate("main_window", "Дата"))
         item = self.table_widget.horizontalHeaderItem(3)
-        item.setText(_translate("main_window", "Одобрение"))
+        item.setText(_translate("main_window", "Полезность"))
         item = self.table_widget.horizontalHeaderItem(4)
         item.setText(_translate("main_window", "Текст"))
         __sortingEnabled = self.table_widget.isSortingEnabled()

@@ -1,11 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
-
+from MongoDb import *
 import time
 import configparser
-
-from MongoDb import *
 
 
 class GooglePlayScraper:
@@ -17,7 +15,7 @@ class GooglePlayScraper:
 
     def __parse_config(self, config_file_name, application_name):
         self.config = configparser.ConfigParser()
-        self.config.read(config_file_name)
+        self.config.read(config_file_name, encoding='utf-8')
         self.url_to_scrap = self.config[application_name]['url_to_scrap']
         self.collection_name_prefix = self.config[application_name]['collection_name_prefix']
         self.sleep_in_seconds = int(self.config['Scraper']['sleep_in_seconds'])
@@ -67,53 +65,53 @@ class GooglePlayScraper:
         self.driver.get(self.url_to_scrap)
         for i in range(self.page_to_scrap_count):
             self.page_to_parse_index += 1
-
             reviews = self.__get_reviews_containers()
             if len(reviews) == 40:
                 print("OK: {0} out of 40".format(len(reviews)))
             else:
                 print("WARN: {0} out of 40".format(len(reviews)))
-
             reviews_data = self.__get_reviews_data(reviews)
             self.mongo.write_reviews(reviews_data)
-
             self.__delete_reviews()
             self.__trigger_next_page()
-
             if self.__check_button_existence():
                 self.__click_button()
-
             time.sleep(self.sleep_in_seconds)
         self.driver.quit()
 
     def __get_reviews_containers(self):
         try:
             reviews = self.driver.find_elements_by_xpath("//div[contains(@jsname, 'fk8dgd')]/div")
-            return reviews
         except Exception as e:
             print("[ERROR] ошибка при получении отзывов со страницы: {0}\n".format(str(e)))
-            return []
+            reviews = []
+        return reviews
 
     def __get_reviews_data(self, reviews):
         reviews_data = []
         for review in reviews:
             name = review.find_element_by_xpath(".//span[contains(@class, 'X43Kjb')]").text
-            score = review.find_element_by_xpath(
+            score = int(review.find_element_by_xpath(
                 ".//div[contains(@role, 'img')]"
-            ).get_attribute("aria-label").split()[2]
-            likes = review.find_element_by_xpath(".//div[contains(@class, 'jUL89d y92BAb')]").text
+            ).get_attribute("aria-label").split()[2])
+            likes = self.__get_likes(review)
             date = self.__get_date(review)
             has_photo = '/photo.jpg' not in review.find_element_by_xpath(
                 ".//img[contains(@class, 'T75of ZqMJr')]"
             ).get_attribute("src")
-            text = review.find_element_by_xpath(".//span[contains(@jsname, 'fbQN7e')]").get_attribute('textContent')
-            if text == '':
-                text = review.find_element_by_xpath(".//span[contains(@jsname, 'bN97Pc')]").text
-            # TODO: likes = "" -> 0
+            text = self.__get_text(review)
             reviews_data.append({
                 'name': name, 'score': score, 'date': date, 'likes': likes, 'has_photo': has_photo, 'text': text
             })
         return reviews_data
+
+    def __get_likes(self, review):
+        likes = review.find_element_by_xpath(".//div[contains(@class, 'jUL89d y92BAb')]").text
+        if likes == '':
+            likes = 0
+        else:
+            likes = int(likes)
+        return likes
 
     def __get_date(self, review):
         date_splitted_str = review.find_element_by_xpath(".//span[contains(@class, 'p2TkOb')]").text.split()
@@ -126,10 +124,15 @@ class GooglePlayScraper:
         month = month_str_to_num[month_str]
         return year + '-' + month + '-' + day
 
+    def __get_text(self, review):
+        text = review.find_element_by_xpath(".//span[contains(@jsname, 'fbQN7e')]").get_attribute('textContent')
+        if text == '':
+            text = review.find_element_by_xpath(".//span[contains(@jsname, 'bN97Pc')]").text
+        return text
+
 
 if __name__ == '__main__':
-    # application_name = 'YandexMail'
-    application_name = 'Duolingo'
+    application_name = 'test'
     config_file_name = '../settings.ini'
     scraper = GooglePlayScraper(application_name, config_file_name)
     scraper.scrap()
